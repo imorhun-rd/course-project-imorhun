@@ -1,0 +1,2351 @@
+{
+	"info": {
+		"_postman_id": "aa93b2e1-29e9-4593-9a04-1609209e44b8",
+		"name": "Course project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26907224"
+	},
+	"item": [
+		{
+			"name": "Get Tasks",
+			"item": [
+				{
+					"name": "Array of tasks in the console",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"jsonData.tasks.forEach(item =>{",
+									"    console.log(`name is ${item.name} and id is ${item.id}`) // Access the id and name property of each list item",
+									"    console.log(item.id) // Access the id property of each list item",
+									"    console.log(item.name) // Access the name property of each list item",
+									"}) "
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "pk_188594880_WNABWGQ8CLPJ8MDG287ZIZC227JLOTEG"
+							},
+							{
+								"key": "accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"list",
+								"{{list_id}}",
+								"task"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Task",
+			"item": [
+				{
+					"name": "Check schema for response body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const Ajv = require('ajv');",
+									"const ajv = new Ajv();",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"const schema = {",
+									"    type: 'object',",
+									"    properties: {",
+									"        id: { type: 'string' },",
+									"        custom_id: { type: ['string', 'null'] },",
+									"        custom_item_id: { type: 'integer' },",
+									"        name: { type: 'string' },",
+									"        text_content: { type: ['string', 'null'] },",
+									"        description: { type: ['string', 'null'] },",
+									"        status: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                id: { type: 'string' },",
+									"                status: { type: 'string' },",
+									"                color: { type: 'string' },",
+									"                orderindex: { type: 'integer' },",
+									"                type: { type: 'string' }",
+									"            },",
+									"            required: ['id', 'status', 'color', 'orderindex', 'type']",
+									"        },",
+									"        orderindex: { type: 'string' },",
+									"        date_created: { type: 'string' },",
+									"        date_updated: { type: 'string' },",
+									"        date_closed: { type: ['string', 'null'] },",
+									"        date_done: { type: ['string', 'null'] },",
+									"        archived: { type: 'boolean' },",
+									"        creator: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                id: { type: 'integer' },",
+									"                username: { type: 'string' },",
+									"                color: { type: 'string' },",
+									"                email: { type: 'string' },",
+									"                profilePicture: { type: ['string', 'null'] }",
+									"            },",
+									"            required: ['id', 'username', 'email']",
+									"        },",
+									"        assignees: { type: 'array', items: {} },",
+									"        group_assignees: { type: 'array', items: {} },",
+									"        watchers: { type: 'array', items: {} },",
+									"        checklists: { type: 'array', items: {} },",
+									"        tags: { type: 'array', items: {} },",
+									"        parent: { type: ['string', 'null'] },",
+									"        top_level_parent: { type: ['string', 'null'] },",
+									"        priority: { type: ['string', 'null'] },",
+									"        due_date: { type: ['string', 'null'] },",
+									"        start_date: { type: ['string', 'null'] },",
+									"        points: { type: ['integer', 'null'] },",
+									"        time_estimate: { type: ['integer', 'null'] },",
+									"        time_spent: { type: 'integer' },",
+									"        custom_fields: { type: 'array', items: {} },",
+									"        dependencies: { type: 'array', items: {} },",
+									"        linked_tasks: { type: 'array', items: {} },",
+									"        locations: { type: 'array', items: {} },",
+									"        team_id: { type: 'string' },",
+									"        url: { type: 'string' },",
+									"        sharing: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                public: { type: 'boolean' },",
+									"                public_share_expires_on: { type: ['string', 'null'] },",
+									"                public_fields: { type: 'array', items: { type: 'string' } },",
+									"                token: { type: ['string', 'null'] },",
+									"                seo_optimized: { type: 'boolean' }",
+									"            },",
+									"            required: ['public', 'public_fields', 'seo_optimized']",
+									"        },",
+									"        permission_level: { type: 'string' },",
+									"        list: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                id: { type: 'string' },",
+									"                name: { type: 'string' },",
+									"                access: { type: 'boolean' }",
+									"            },",
+									"            required: ['id', 'name', 'access']",
+									"        },",
+									"        project: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                id: { type: 'string' },",
+									"                name: { type: 'string' },",
+									"                hidden: { type: 'boolean' },",
+									"                access: { type: 'boolean' }",
+									"            },",
+									"            required: ['id', 'name', 'hidden', 'access']",
+									"        },",
+									"        folder: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                id: { type: 'string' },",
+									"                name: { type: 'string' },",
+									"                hidden: { type: 'boolean' },",
+									"                access: { type: 'boolean' }",
+									"            },",
+									"            required: ['id', 'name', 'hidden', 'access']",
+									"        },",
+									"        space: {",
+									"            type: 'object',",
+									"            properties: {",
+									"                id: { type: 'string' }",
+									"            },",
+									"            required: ['id']",
+									"        },",
+									"        attachments: { type: 'array', items: {} }",
+									"    },",
+									"    required: ['id', 'name', 'status', 'archived', 'creator', 'team_id', 'url', 'sharing', 'permission_level', 'list', 'project', 'folder', 'space']",
+									"};",
+									"",
+									"",
+									"pm.test('Response matches schema', function() {",
+									"    const validate = ajv.compile(schema);",
+									"    const valid = validate(response);",
+									"    pm.expect(valid, validate.errors).to.be.true;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "pk_188594880_WNABWGQ8CLPJ8MDG287ZIZC227JLOTEG"
+							},
+							{
+								"key": "accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/v2/task/{{task_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"task",
+								"{{task_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CRUD Task",
+			"item": [
+				{
+					"name": "Get Task - prescript / afterscript with function",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									" console.log(\"Pre-request logs\")",
+									"    var task_name = pm.variables.replaceIn(\"{{$randomProductName}}\")",
+									"        pm.environment.set(\"task_name\", task_name);",
+									"            console.log(`random task_name is ${task_name}`)",
+									"    var task_description = pm.variables.replaceIn(\"{{$randomLoremWords}}\")",
+									"        pm.environment.set(\"task_description\", task_description);",
+									"            console.log(`random task_description is ${task_description}`)",
+									"",
+									"",
+									"try {",
+									"    var url = pm.environment.get(\"url\");",
+									"    var new_task_id = pm.environment.get(\"new_task_id\");",
+									"        console.log(`previous new_task_id is ${new_task_id}`)",
+									"    var list_id = pm.environment.get(\"list_id\");",
+									"         console.log(`list_id is ${list_id}`)",
+									"    var Authorization = pm.environment.get(\"Authorization\");",
+									"    var task_name = pm.environment.get(\"task_name\");",
+									"    var task_description = pm.environment.get(\"task_description\");",
+									"",
+									"    const response = pm.sendRequest({",
+									"        url: `${url}/api/v2/list/${list_id}/task`,",
+									"        method: \"POST\",",
+									"        header:{",
+									"             \"Authorization\":`${Authorization}`,",
+									"             \"Content-type\": \"application/json\"",
+									"        },",
+									"        body: {",
+									"            mode: \"raw\",",
+									"            raw: JSON.stringify({",
+									"            \"name\": `${task_name}`,",
+									"            \"description\": `${task_description}`,",
+									"            \"due_date\": 1508369194377,",
+									"            \"time_estimate\": 8640000,",
+									"            \"start_date\": 1567780450202",
+									"        })",
+									"        },",
+									"        }, function (err, res) {",
+									"            if (err) {",
+									"                console.log(\"here function ERROR\")",
+									"             console.error(err);",
+									"        } else {",
+									"        var jsonData = res.json();",
+									"         console.log(res.json());",
+									"             pm.environment.set(\"new_task_id\", jsonData.id);",
+									"               console.log(`created new_task_id in pre-request is ${jsonData.id}`)",
+									"    }",
+									"    });",
+									"            ",
+									"",
+									"} catch (err) {",
+									"    console.error(err);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log(\"Post-response logs - DELETE\")",
+									"",
+									"try {",
+									"    var url = pm.environment.get(\"url\");",
+									"    var new_task_id = pm.environment.get(\"new_task_id\");",
+									"         console.log(`new_task_id before delete is ${new_task_id}`)",
+									"    var Authorization = pm.environment.get(\"Authorization\");",
+									"    ",
+									"    const response = pm.sendRequest({",
+									"        url: `${url}/api/v2/task/${new_task_id}`,",
+									"        method: \"DELETE\",",
+									"        header: {",
+									"             \"Authorization\":`${Authorization}`,",
+									"             \"Content-type\": \"application/json\"",
+									"            }, ",
+									"        },",
+									"        function (err, res) {",
+									"    if (err) {",
+									"        console.error(\"Request failed:\", err);",
+									"    } else{",
+									"        console.log(\"Status:\", res.code);",
+									"                if (res.text()) {",
+									"                    try {",
+									"                        console.log(\"Body:\", res.json());",
+									"                    } catch (parseErr) {",
+									"                        console.warn(\"Failed to parse JSON:\", parseErr.message);",
+									"                    }",
+									"                } else {",
+									"                    console.log(\"No response body.\");",
+									"                }",
+									"            }",
+									"        });",
+									"",
+									"} catch (err) {",
+									"    console.error(err);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}"
+							},
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/v2/task/{{task_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"task",
+								"{{task_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Work with task",
+			"item": [
+				{
+					"name": "Get Tasks",
+					"item": [
+						{
+							"name": "Get Tasks - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									],
+									"query": [
+										{
+											"key": "archived",
+											"value": "true",
+											"disabled": true
+										},
+										{
+											"key": "archived",
+											"value": "false",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get archived  Tasks - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									},
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task?archived=true",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									],
+									"query": [
+										{
+											"key": "archived",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Tasks with invalid token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Token invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Token invalid\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization_inv}}",
+										"type": "text"
+									},
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Tasks without Authorization token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Authorization header required\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Authorization header required\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Tasks with empty list_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - List ID invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.include(\"List ID invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/list//task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Tasks with invalid list_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Team not authorized\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Team not authorized\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/folder/{{list_id_inv}}/list",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"folder",
+										"{{list_id_inv}}",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Tasks with incorrect list_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - List ID invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.include(\"List ID invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/list/list_id/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"list_id",
+										"task"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create Task",
+					"item": [
+						{
+							"name": "Create Task - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"    var jsonData = pm.response.json();",
+											"    var id = jsonData.id",
+											"    var name = jsonData.name",
+											"    var description = jsonData.description",
+											"",
+											"pm.environment.set(\"crud_task_id\", id);",
+											"pm.environment.set(\"crud_task_name\", name);",
+											"pm.environment.set(\"crud_task_description\", description);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check created Task by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Check crud_task_id\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.id).to.eql( pm.environment.get (\"crud_task_id\"));",
+											"});",
+											"",
+											"pm.test(\"Check crud_task_name\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.name).to.eql( pm.environment.get (\"crud_task_name\"));",
+											"});",
+											"",
+											"pm.test(\"Check crud_task_description\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.description).to.eql( pm.environment.get (\"crud_task_description\"));",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task with invalid token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Token invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Token invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization_inv}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task without Authorization token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Authorization header required\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Authorization header required\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task with empty list_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list//task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task with invalid list_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Team not authorized\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Team not authorized\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id_inv}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id_inv}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task with incorrect list_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - List ID invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.include(\"List ID invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/list_id/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"list_id",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task without name - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Task name invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Task name invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Task with invalid name - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": task_name,\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/list/{{list_id}}/task",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"list",
+										"{{list_id}}",
+										"task"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Task",
+					"item": [
+						{
+							"name": "Get Task - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Check crud_task_id\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.id).to.eql( pm.environment.get (\"crud_task_id\"));",
+											"});",
+											"",
+											"pm.test(\"Check crud_task_name\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.name).to.eql( pm.environment.get (\"crud_task_name\"));",
+											"});",
+											"",
+											"pm.test(\"Check crud_task_description\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.description).to.eql( pm.environment.get (\"crud_task_description\"));",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Task with invalid token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Token invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Token invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization_inv}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Task without Authorization token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Authorization header required\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Authorization header required\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Task with empty task_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Route not found\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Route not found\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Task with invalid task_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Team not authorized\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Team not authorized\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id_inv}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id_inv}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update Task",
+					"item": [
+						{
+							"name": "Update Task - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"    var jsonData = pm.response.json();",
+											"    var name = jsonData.name",
+											"    var description = jsonData.description",
+											"",
+											"pm.environment.set(\"update_crud_task_name\", name);",
+											"pm.environment.set(\"update_crud_task_description\", description);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check updated Task by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Check update_crud_task_name\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.name).to.eql( pm.environment.get (\"update_crud_task_name\"));",
+											"});",
+											"",
+											"pm.test(\"Check update_crud_task_description\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.description).to.eql( pm.environment.get (\"update_crud_task_description\"));",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Task without name - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"    var jsonData = pm.response.json();",
+											"    var description = jsonData.description",
+											"",
+											"pm.environment.set(\"update_crud_task_description\", description);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check updated task_description by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Check update_crud_task_description\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.description).to.eql( pm.environment.get (\"update_crud_task_description\"));",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Task with invalid token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Token invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Token invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization_inv}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Task without Authorization token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Authorization header required\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Authorization header required\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Task with empty task_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Task with invalid task_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Team not authorized\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Team not authorized\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id_inv}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id_inv}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Task with invalid name - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": name_task,\n    \"description\": \"{{$randomLoremWords}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id_inv}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id_inv}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Delete Task",
+					"item": [
+						{
+							"name": "Delete Task with invalid token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Token invalid\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Token invalid\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization_inv}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Task without Authorization token - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Authorization header required\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Authorization header required\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Task with empty task_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Task with invalid task_id - negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Team not authorized\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Team not authorized\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id_inv}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id_inv}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Task - positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 204\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check deleted Task by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Body matches string - Task not found, deleted\", function () {",
+											"    pm.expect(pm.response.json().err).to.equal(\"Task not found, deleted\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{Authorization}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/api/v2/task/{{crud_task_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"task",
+										"{{crud_task_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
